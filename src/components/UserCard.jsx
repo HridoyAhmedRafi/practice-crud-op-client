@@ -1,6 +1,11 @@
+"use client";
+
+import Link from "next/link";
 import { Mail, User as UserIcon } from "lucide-react";
 import { cn } from "cn";
 import { EditUser } from "./EditUser";
+import { Button, buttonVariants } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 /**
  * Card showing a single user's basic info.
@@ -8,6 +13,17 @@ import { EditUser } from "./EditUser";
  * render — we fall back to a dummy, social-media style rounded avatar.
  */
 const UserCard = ({ user, className }) => {
+  const router = useRouter();
+  const handleDelete = async () => {
+    const res = await fetch(`http://localhost:5000/users/${user._id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.deletedCount > 0) {
+      router.refresh();
+    }
+  };
+
   if (!user) return null;
 
   const { name, email } = user;
@@ -36,8 +52,18 @@ const UserCard = ({ user, className }) => {
           <Mail className="size-3.5 shrink-0" aria-hidden="true" />
           <span className="truncate">{email || "No email"}</span>
         </p>
-        <div className="mt-2">
-          <EditUser user={user}></EditUser>
+        <div className="mt-2 flex gap-2">
+          <EditUser user={user} />
+          <Link href={`/user/${user._id}`} className={buttonVariants()}>
+            Details
+          </Link>
+          <Button
+            onClick={handleDelete}
+            variant="destructive"
+            className="cursor-pointer"
+          >
+            Delete
+          </Button>
         </div>
       </div>
     </div>

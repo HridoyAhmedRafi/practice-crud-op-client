@@ -18,7 +18,6 @@ const AddUser = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const user = Object.fromEntries(formData.entries());
-    console.log("user from client", user);
 
     const res = await fetch("http://localhost:5000/users", {
       method: "POST",
@@ -28,7 +27,6 @@ const AddUser = () => {
       body: JSON.stringify(user),
     });
     const data = await res.json();
-    console.log("Response from server", data);
     if (data.acknowledged) {
       redirect("/");
     }

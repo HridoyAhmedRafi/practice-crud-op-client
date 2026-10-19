@@ -13,26 +13,44 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 export function EditUser({ user }) {
+  const router = useRouter();
+  const { _id } = user;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const updatedUser = Object.fromEntries(formData.entries());
     console.log("Updated user from client", updatedUser);
+    const res = await fetch(`http://localhost:5000/users/${_id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedUser),
+    });
+
+    const data = await res.json();
+    console.log("Updated user response from server", data);
+
+    if (data.modifiedCount > 0) {
+      router.refresh();
+    }
   };
 
   return (
     <Dialog>
-      <form onSubmit={handleSubmit}>
-        <DialogTrigger
-          render={
-            <Button variant="outline" className="cursor-pointer">
-              Edit
-            </Button>
-          }
-        />
-        <DialogContent className="sm:max-w-sm">
+      <DialogTrigger
+        render={
+          <Button variant="outline" className="cursor-pointer">
+            Edit
+          </Button>
+        }
+      />
+      <DialogContent className="sm:max-w-sm">
+        <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Edit profile</DialogTitle>
             <DialogDescription>
@@ -46,20 +64,16 @@ export function EditUser({ user }) {
               <Input id="name-1" name="name" defaultValue={user.name} />
             </Field>
             <Field>
-              <Label htmlFor="username-1">Username</Label>
-              <Input
-                id="username-1"
-                name="username"
-                defaultValue={user.email}
-              />
+              <Label htmlFor="email-1">Email</Label>
+              <Input id="email" name="email" defaultValue={user.email} />
             </Field>
           </FieldGroup>
           <DialogFooter>
-            <DialogClose render={<Button variant="outline">Cancel</Button>} />
-            <Button type="submit">Save changes</Button>
+            <DialogClose className='cursor-pointer' render={<Button variant="outline">Cancel</Button>} />
+            <DialogClose className='cursor-pointer' render={<Button type="submit">Save changes</Button>} />
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
