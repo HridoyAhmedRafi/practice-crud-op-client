@@ -23,7 +23,7 @@ export function EditUser({ user }) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const updatedUser = Object.fromEntries(formData.entries());
-    console.log("Updated user from client", updatedUser);
+
     const res = await fetch(`http://localhost:5000/users/${_id}`, {
       method: "PATCH",
       headers: {
